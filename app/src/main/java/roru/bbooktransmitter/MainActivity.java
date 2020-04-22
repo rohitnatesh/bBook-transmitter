@@ -27,19 +27,18 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.BeaconTransmitter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-    final String deviceUUID = "5fee6dd7-2999-4e61-a6b8-0ca0803a4269";
-    BluetoothAdapter bluetoothAdapter;
+    private final String deviceUUID = "5fee6dd7-2999-4e61-a6b8-0ca0803a4269";
+    private final List<Integer> bId = new ArrayList<>();
+    private final List<String> bProvider = new ArrayList<>();
+    private BluetoothAdapter bluetoothAdapter;
     private BeaconTransmitter beaconTransmitter;
     private Beacon beacon;
     private Switch toggle;
-    private List<Integer> bId = new ArrayList<>();
-    private List<String> bProvider = new ArrayList<>();
     private Spinner beaconSpinner;
     private String selectedBeaconId;
 
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        beaconSpinner =  findViewById(R.id.serviceProvider);
+        beaconSpinner = findViewById(R.id.serviceProvider);
         toggle = findViewById(R.id.toggleTransmit);
 
         toggle.setEnabled(false);
@@ -100,21 +99,21 @@ public class MainActivity extends AppCompatActivity {
         startDatabase();
     }
 
-    void initBeacon() {
+    private void initBeacon() {
         beacon = new Beacon.Builder()
                 .setId1(deviceUUID)
                 .setId2(selectedBeaconId)
                 .setId3("0")
                 .setTxPower(-69)
                 .setRssi(-56)
-                .setDataFields(Arrays.asList(new Long[]{0l}))
+                .setDataFields(Collections.singletonList(0L))
                 .build();
         BeaconParser beaconParser = new BeaconParser()
                 .setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT);
         beaconTransmitter = new BeaconTransmitter(getApplicationContext(), beaconParser);
     }
 
-    void destroyBeacon() {
+    private void destroyBeacon() {
         if (beaconTransmitter != null) {
             beaconTransmitter.stopAdvertising();
         }
@@ -130,24 +129,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            Map<String, Object> data;
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                data = document.getData();
                                 bId.add(Integer.parseInt(document.getId()));
-                                bProvider.add(Objects.requireNonNull(data.get("title")).toString());
+                                bProvider.add(Objects.requireNonNull(document.get("title")).toString());
                             }
                         }
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, bProvider);
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         beaconSpinner.setAdapter(adapter);
                         toggle.setEnabled(true);
-
                     }
                 });
-
     }
 }
-
-
-//TODO:  if (beacons.size() > 0)  try this out
-
