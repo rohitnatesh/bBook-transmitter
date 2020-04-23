@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-    private final String deviceUUID = "5fee6dd7-2999-4e61-a6b8-0ca0803a4269";
     private final List<Integer> bId = new ArrayList<>();
     private final List<String> bProvider = new ArrayList<>();
     private BluetoothAdapter bluetoothAdapter;
@@ -70,25 +69,26 @@ public class MainActivity extends AppCompatActivity {
                     if (!bluetoothAdapter.isEnabled()) {
                         toggle.setChecked(false);
                         startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
-                    }
-                    beaconSpinner.setEnabled(false);
-                    initBeacon();
-                    beaconTransmitter.startAdvertising(beacon, new AdvertiseCallback() {
-                        @Override
-                        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-                            super.onStartSuccess(settingsInEffect);
-                            Toast.makeText(getApplicationContext(),
-                                    "Started signal transmission", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        beaconSpinner.setEnabled(false);
+                        initBeacon();
+                        beaconTransmitter.startAdvertising(beacon, new AdvertiseCallback() {
+                            @Override
+                            public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+                                super.onStartSuccess(settingsInEffect);
+                                Toast.makeText(getApplicationContext(),
+                                        "Started signal transmission", Toast.LENGTH_SHORT).show();
+                            }
 
-                        @Override
-                        public void onStartFailure(int errorCode) {
-                            super.onStartFailure(errorCode);
-                            destroyBeacon();
-                            Toast.makeText(getApplicationContext(),
-                                    "Failed to transmit signal", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                            @Override
+                            public void onStartFailure(int errorCode) {
+                                super.onStartFailure(errorCode);
+                                destroyBeacon();
+                                Toast.makeText(getApplicationContext(),
+                                        "Failed to transmit signal", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 } else {
                     beaconSpinner.setEnabled(true);
                     destroyBeacon();
@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initBeacon() {
+        String deviceUUID = "5fee6dd7-2999-4e61-a6b8-0ca0803a4269";
         beacon = new Beacon.Builder()
                 .setId1(deviceUUID)
                 .setId2(selectedBeaconId)
