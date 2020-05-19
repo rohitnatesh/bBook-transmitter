@@ -112,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
         BeaconParser beaconParser = new BeaconParser()
                 .setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT);
         beaconTransmitter = new BeaconTransmitter(getApplicationContext(), beaconParser);
+        beaconTransmitter.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
+        beaconTransmitter.setAdvertiseTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM);
     }
 
     private void destroyBeacon() {
